@@ -1,1 +1,1 @@
-# CAS_AI_2021
+# CAS Artificial Intelligence

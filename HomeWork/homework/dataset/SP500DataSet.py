@@ -5,10 +5,14 @@ import yfinance as yf
 import requests
 import bs4 as bs
 import os
+import torch
+import torch.utils.data as data_utils
+from torch.utils.data import DataLoader
 
 
 class SP500DataSet:
     def __init__(self, start=datetime.datetime(2010, 1, 1), stop=datetime.datetime.now()):
+        self.df_returns = None
         self.url = 'http://en.wikipedia.org/wiki/List_of_S%26P_500_companies'
         self.stocks_file_name = "sp500_closefull.csv"
         self.start = start
@@ -62,4 +66,19 @@ class SP500DataSet:
         # split into train and test
         df_returns.dropna(axis=0, how='any', inplace=True)
         df_returns.SPY = [1 if spy > 0 else 0 for spy in df_returns.SPY]
+        self.df_returns = df_returns
         return df_returns
+
+    def get_loaders(self, batch_size=16, n_test=1000, device='cpu'):
+        if self.df_returns is None:
+            self.load()
+
+        features = self.df_returns.drop('SPY', axis=1).values
+        labels = self.df_returns.SPY
+        training_data = data_utils.TensorDataset(torch.tensor(features[:-n_test]).float().to(device),
+                                                 torch.tensor(labels[:-n_test]).float().to(device))
+        test_data = data_utils.TensorDataset(torch.tensor(features[n_test:]).float().to(device),
+                                             torch.tensor(labels[n_test:]).float().to(device))
+        train_dataloader = DataLoader(training_data, batch_size=batch_size, shuffle=False)
+        test_dataloader = DataLoader(test_data, batch_size=batch_size, shuffle=False)
+        return train_dataloader, test_dataloader

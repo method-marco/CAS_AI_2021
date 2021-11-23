@@ -3,7 +3,7 @@ import torch.utils.data as data_utils
 from torch.utils.data import DataLoader
 
 
-class Trainer:
+class BinaryClassificationTrainer:
     def __init__(self, model, loss_fn, device='cpu'):
         self.model = model.to(device)
         self.loss_fn = loss_fn

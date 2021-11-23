@@ -59,11 +59,11 @@ def train_and_display(x, y, a, b, loss_function=MeanSquaredError(), epochs=1000)
 
 def start():
     for i in range(3):
-        X = np.random.rand(100)
-        a = 2
-        b = 6
+        X = np.random.rand(1000)
+        a = 4
+        b = 2
         Y = [a * x + b for x in X]  # ein Axon, immer nur eins, Function -
 
         # ab wann feuert er (hier sofort), wie werden die Inputs moduliert (hier mit 2*x + 6)
         # aktivierungs-funktion(Y), Schalter ein/aus
-        train_and_display(X, Y, a, b, loss_function=MeanSquaredError())
+        train_and_display(X, Y, a, b, loss_function=MeanSquaredError(), epochs=2000)

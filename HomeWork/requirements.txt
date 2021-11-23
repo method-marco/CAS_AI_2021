@@ -4,3 +4,4 @@ matplotlib
 torch
 pytorch-forecasting
 tensorflow
+pip install pytorch-lightning

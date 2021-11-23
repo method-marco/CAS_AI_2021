@@ -10,12 +10,13 @@ from torch.utils.data import DataLoader
 
 class VAETrainer:
 
-    def __init__(self):
+    def __init__(self, reparameterization_strength = 1):
         super(VAETrainer, self).__init__()
         torch.manual_seed(0)
 
         cuda = torch.cuda.is_available()
         self.device = torch.device("cuda" if cuda else "cpu")
+        self.reparameterization_strength = reparameterization_strength
         self.model = None
 
     def train_epoch(self, train_dataloader, optimizer, epoch):
@@ -49,7 +50,7 @@ class VAETrainer:
         test_dataloader = DataLoader(test_data, batch_size=batch_size, shuffle=shuffle)
 
         size = train_dataloader.dataset.tensors[0].data.shape[1]  # + 1
-        self.model = VAE(size).to(self.device)
+        self.model = VAE(size, self.reparameterization_strength).to(self.device)
         optimizer = torch.optim.Adam(self.model.parameters(), lr=learning_rate)
 
         for epoch in range(1, epochs + 1):

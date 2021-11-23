@@ -66,8 +66,8 @@ def start_sp500_binary_classification_with_augmented_data():
     features = data.drop('SPY', axis=1).values
     labels = data.SPY
 
-    augmenter = DataAugmenter()
-    new_features, new_labels = augmenter.augment_data(features, labels)
+    augmenter = DataAugmenter(augmented_batch_size=32, augmented_after_batch=16)
+    new_features, new_labels = augmenter.augment_data(features, labels, augmentation_strength=0.5)
 
     model = NeuralNetwork()
     loss_fn = nn.BCEWithLogitsLoss()

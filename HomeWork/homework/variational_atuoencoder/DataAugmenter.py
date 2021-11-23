@@ -17,8 +17,8 @@ class DataAugmenter:
         cuda = torch.cuda.is_available()
         self.device = torch.device("cuda" if cuda else "cpu")
 
-    def augment_data(self, features, labels, replace=False):
-        trainer = VAETrainer()
+    def augment_data(self, features, labels, augmentation_strength = 1, replace=False):
+        trainer = VAETrainer(augmentation_strength)
         trainer.train(features, labels, epochs=self.vae_epochs, batch_size=self.vae_batch_size,
                       learning_rate=self.vae_learning_rate)
 

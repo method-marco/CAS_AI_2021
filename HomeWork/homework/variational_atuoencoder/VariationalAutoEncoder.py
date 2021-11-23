@@ -4,12 +4,12 @@ from torch.nn import functional as F
 
 
 class VAE(nn.Module):
-    def __init__(self, n_obs):
+    def __init__(self, n_obs, reparameterization_strength = 1):
         super(VAE, self).__init__()
-
+        self.reparameterization_strength = reparameterization_strength
         self.fc1 = nn.Linear(n_obs, 400)
-        self.fc21 = nn.Linear(400, 20)  # mu 30
-        self.fc22 = nn.Linear(400, 20)  # log 30 variance
+        self.fc21 = nn.Linear(400, 20)
+        self.fc22 = nn.Linear(400, 20)
         self.fc3 = nn.Linear(20, 400)
         self.fc4 = nn.Linear(400, n_obs)
 
@@ -19,7 +19,7 @@ class VAE(nn.Module):
 
     def reparameterize(self, mu, logvar):
         std = torch.exp(0.5 * logvar)
-        eps = torch.randn_like(std)
+        eps = self.reparameterization_strength * torch.randn_like(std)
 
         return mu + eps * std
 

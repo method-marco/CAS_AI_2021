@@ -29,11 +29,12 @@ def start_sp500_binary_classification():
 def start_data_generator_with_vae():
     trainer_generator = VAETrainerGenerator()
     trainer_generator.train(10)
-    generated_data = trainer_generator.generate(10)
+    generated_data = trainer_generator.generate(100)
+    print(generated_data.shape)
 
     plt.figure(figsize=(12, 8))
-    original_np = trainer_generator.train_loader.dataset.tensors[0].detach().numpy()[0, :]
-    generated_np = generated_data.to_numpy()[0, :-1]
-    plt.plot(original_np[:100])
-    plt.plot(generated_np[:100])
+    original_first_row = trainer_generator.train_loader.dataset.tensors[0].detach().numpy()[0, :]
+    generated_first_row = generated_data.to_numpy()[0, :-1]
+    plt.plot(original_first_row)
+    plt.plot(generated_first_row)
     plt.show()

@@ -4,4 +4,7 @@ matplotlib
 torch
 pytorch-forecasting
 tensorflow
-pip install pytorch-lightning
+pytorch-lightning
+yfinance
+requests
+bs4

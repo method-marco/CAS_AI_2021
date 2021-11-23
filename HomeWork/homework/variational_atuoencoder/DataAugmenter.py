@@ -2,8 +2,6 @@ from homework.variational_atuoencoder.VAETrainer import VAETrainer
 import torch.utils.data as data_utils
 from torch.utils.data import DataLoader
 import torch
-import pandas as pd
-import numpy as np
 
 
 class DataAugmenter:
@@ -53,4 +51,4 @@ class DataAugmenter:
                         new_features = torch.cat([new_features, x_to_add], dim=0)
                         new_labels = torch.cat([new_labels, y], dim=0)
 
-        return pd.DataFrame(new_features), pd.DataFrame(new_labels)
+            return new_features.numpy(), new_labels.numpy()

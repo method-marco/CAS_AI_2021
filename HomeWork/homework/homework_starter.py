@@ -24,7 +24,7 @@ def start_sp500_binary_classification():
     loss_fn = nn.BCEWithLogitsLoss()
     trainer = BinaryClassificationTrainer(model, loss_fn)
 
-    trainer.train(features, labels)
+    return trainer.train(features, labels)
 
 
 def start_data_generator_with_vae():
@@ -58,5 +58,21 @@ def start_data_augmenter_sp500():
     new_f, new_l = augmenter.augment_data(features, labels)
     print('Number of original rows {}'.format(features.shape))
     print('Number of new rows {}'.format(new_f.shape))
+
+
+def start_sp500_binary_classification_with_augmented_data():
+    dataset = SP500DataSet()
+    data = dataset.load()
+    features = data.drop('SPY', axis=1).values
+    labels = data.SPY
+
+    augmenter = DataAugmenter()
+    new_features, new_labels = augmenter.augment_data(features, labels)
+
+    model = NeuralNetwork()
+    loss_fn = nn.BCEWithLogitsLoss()
+    trainer = BinaryClassificationTrainer(model, loss_fn)
+
+    return trainer.train(new_features, new_labels)
 
 

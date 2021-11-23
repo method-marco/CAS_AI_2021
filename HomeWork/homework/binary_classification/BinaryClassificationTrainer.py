@@ -30,19 +30,18 @@ class BinaryClassificationTrainer:
 
     def train(self, features, labels, batch_size=16, learning_rate=0.0001, epochs=10, n_test=1000):
         optimizer = torch.optim.Adam(self.model.parameters(), lr=learning_rate)
-
         training_data = data_utils.TensorDataset(torch.tensor(features[:-n_test]).float().to(self.device),
                                                  torch.tensor(labels[:-n_test]).float().to(self.device))
         test_data = data_utils.TensorDataset(torch.tensor(features[n_test:]).float().to(self.device),
                                              torch.tensor(labels[n_test:]).float().to(self.device))
         train_dataloader = DataLoader(training_data, batch_size=batch_size, shuffle=False)
         test_dataloader = DataLoader(test_data, batch_size=batch_size, shuffle=False)
-
         for t in range(epochs):
             print(f"Epoch {t + 1}\n-------------------------------")
             self.train_epoch(train_dataloader, optimizer)
-            self.test(test_dataloader)
+            last_test_result = self.test(test_dataloader)
         print("Done!")
+        return last_test_result
 
     def test(self, test_dataloader):
         size = len(test_dataloader.dataset)
@@ -59,3 +58,4 @@ class BinaryClassificationTrainer:
         test_loss /= num_batches
         correct /= size
         print(f"Test Error:\nTest Accuracy: {(100 * correct):>0.1f}%, Avg test loss: {test_loss:>8f} \n")
+        return (correct, test_loss)

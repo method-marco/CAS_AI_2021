@@ -9,7 +9,7 @@ class BinaryClassificationTrainer:
         self.loss_fn = loss_fn
         self.device = device
 
-    def train_batch(self, train_dataloader, optimizer):
+    def train_epoch(self, train_dataloader, optimizer):
         size = len(train_dataloader.dataset)
         self.model.train()
         for batch, (X, y) in enumerate(train_dataloader):
@@ -40,7 +40,7 @@ class BinaryClassificationTrainer:
 
         for t in range(epochs):
             print(f"Epoch {t + 1}\n-------------------------------")
-            self.train_batch(train_dataloader, optimizer)
+            self.train_epoch(train_dataloader, optimizer)
             self.test(test_dataloader)
         print("Done!")
 

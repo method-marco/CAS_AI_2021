@@ -3,6 +3,7 @@ from homework.dataset.SP500DataSet import SP500DataSet
 from homework.binary_classification.BinaryClassificationTrainer import BinaryClassificationTrainer
 from homework.binary_classification.NeuronalNetwork import NeuralNetwork
 from homework.variational_atuoencoder.VAETrainer import VAETrainer
+from homework.variational_atuoencoder.DataAugmenter import DataAugmenter
 from torch import nn
 import matplotlib.pyplot as plt
 
@@ -45,3 +46,17 @@ def start_data_generator_with_vae():
     plt.plot(original_first_row)
     plt.plot(generated_first_row)
     plt.show()
+
+
+def start_data_augmenter_sp500():
+    dataset = SP500DataSet()
+    data = dataset.load()
+    features = data.drop('SPY', axis=1).values
+    labels = data.SPY
+
+    augmenter = DataAugmenter()
+    new_f, new_l = augmenter.augment_data(features, labels)
+    print('Number of original rows {}'.format(features.shape))
+    print('Number of new rows {}'.format(new_f.shape))
+
+

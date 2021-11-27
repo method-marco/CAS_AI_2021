@@ -17,7 +17,7 @@ class DataAugmenter:
         cuda = torch.cuda.is_available()
         self.device = torch.device("cuda" if cuda else "cpu")
 
-    def augment_data(self, features, labels, augmentation_strength = 1, replace=False):
+    def augment_data(self, features, labels, augmentation_strength=1, replace=False):
         trainer = VAETrainer(augmentation_strength)
         trainer.train(features, labels, epochs=self.vae_epochs, batch_size=self.vae_batch_size,
                       learning_rate=self.vae_learning_rate)
@@ -52,3 +52,17 @@ class DataAugmenter:
                         new_labels = torch.cat([new_labels, y], dim=0)
 
             return new_features.numpy(), new_labels.numpy()
+
+    def append_augment_data(self, features, labels, data_multiplication = 2,  augmentation_strength=1):
+        trainer = VAETrainer(augmentation_strength)
+        trainer.train(features, labels, epochs=self.vae_epochs, batch_size=self.vae_batch_size,
+                          learning_rate=self.vae_learning_rate)
+        new_features = torch.tensor(features).float().to(self.device)
+        new_labels = torch.tensor(labels).float().to(self.device)
+        for i in range(data_multiplication):
+            with torch.no_grad():
+                sample_feat, _, _ = trainer.model(torch.tensor(features).float().to(self.device))
+                sample_labels = torch.tensor(labels).float().to(self.device)
+                new_features = torch.cat([new_features, sample_feat], dim=0)
+                new_labels = torch.cat([new_labels, sample_labels], dim=0)
+        return new_features.numpy(), new_labels.numpy()

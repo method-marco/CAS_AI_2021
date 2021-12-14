@@ -18,7 +18,7 @@ class SP500DataSet:
         self.start = start
         self.stop = stop
 
-    def load(self):
+    def load(self, binary = True):
 
         start = self.start
         end = self.stop
@@ -65,7 +65,8 @@ class SP500DataSet:
         # df_returns[self.config.stocks_adj_close_names] = df0[self.config.stocks]
         # split into train and test
         df_returns.dropna(axis=0, how='any', inplace=True)
-        df_returns.SPY = [1 if spy > 0 else 0 for spy in df_returns.SPY]
+        if binary:
+            df_returns.SPY = [1 if spy > 0 else 0 for spy in df_returns.SPY]
         self.df_returns = df_returns
         return df_returns
 

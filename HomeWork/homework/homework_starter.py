@@ -4,6 +4,7 @@ from homework.binary_classification.BinaryClassificationTrainer import BinaryCla
 from homework.binary_classification.NeuronalNetwork import NeuralNetwork
 from homework.variational_atuoencoder.VAETrainer import VAETrainer
 from homework.variational_atuoencoder.DataAugmenter import DataAugmenter
+from homework.forecasting.TFTSP500 import TFTSP500
 from torch import nn
 import matplotlib.pyplot as plt
 
@@ -76,4 +77,11 @@ def start_sp500_binary_classification_with_augmented_data():
 
     return trainer.train(new_features, new_labels)
 
+
+def start_sp500_tft():
+    tft = TFTSP500()
+    tft.load_data()
+    tft.create_tft_model()
+    tft.train()
+    tft.evaluate()
 

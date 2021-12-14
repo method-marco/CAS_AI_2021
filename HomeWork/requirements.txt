@@ -5,6 +5,7 @@ torch
 pytorch-forecasting
 tensorflow
 pytorch-lightning
+pyarrow
 yfinance
 requests
 bs4

@@ -6,8 +6,6 @@ from pytorch_lightning.loggers import TensorBoardLogger
 import torch
 from homework.dataset.SP500DataSet import SP500DataSet
 import pandas as pd
-import datetime, calendar
-
 
 class TFTSP500:
 
@@ -29,8 +27,10 @@ class TFTSP500:
         features.remove(target)
 
         sp_df[time_index] = pd.to_datetime(sp_df.index)
-        sp_df[time_index] = sp_df[time_index].dt.year * (365 + (1*calendar.isleap(sp_df[time_index].dt.year))) + sp_df[time_index].dt.days
+        sp_df[time_index] = sp_df[time_index].dt.year * (365 + (1*sp_df[time_index].dt.is_leap_year)) + sp_df[time_index].dt.day_of_year
         sp_df[time_index] -= sp_df[time_index].min()
+
+        sp_df["SPY_Prediction"] = "SPY"
 
         max_encoder_length = 24
         training_cutoff = sp_df[time_index].max() - self.prediction_length
@@ -39,6 +39,7 @@ class TFTSP500:
             sp_df[lambda x: x[time_index] <= training_cutoff],
             time_idx=time_index,
             target=target,
+            group_ids=["SPY_Prediction"],
             min_encoder_length=max_encoder_length // 2,  # keep encoder length long (as it is in the validation set)
             max_encoder_length=max_encoder_length,
             min_prediction_length=1,
@@ -47,6 +48,7 @@ class TFTSP500:
             add_relative_time_idx=True,
             add_target_scales=True,
             add_encoder_length=True,
+            allow_missing_timesteps=True
         )
 
         # create validation set (predict=True) which means to predict the last max_prediction_length points in time
@@ -84,7 +86,7 @@ class TFTSP500:
             # reduce learning rate if no improvement in validation loss after x epochs
             reduce_on_plateau_patience=4,
         )
-        print(f"Number of parameters in network: {tft.size() / 1e3:.1f}k")
+        print(f"Number of parameters in network: {self.model.size() / 1e3:.1f}k")
 
     def train(self):
         # create dataloaders for model

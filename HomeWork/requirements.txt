@@ -3,7 +3,6 @@ pandas
 matplotlib
 torch
 pytorch-forecasting
-tensorflow
 pytorch-lightning
 pyarrow
 yfinance

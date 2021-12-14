@@ -7,6 +7,11 @@ import torch
 from homework.dataset.SP500DataSet import SP500DataSet
 import pandas as pd
 
+import os
+import warnings
+
+warnings.filterwarnings("ignore")  # avoid printing out absolute paths
+
 class TFTSP500:
 
     def __init__(self, prediction_length = 5):
@@ -27,8 +32,8 @@ class TFTSP500:
         features.remove(target)
 
         sp_df[time_index] = pd.to_datetime(sp_df.index)
-        sp_df[time_index] = sp_df[time_index].dt.year * (365 + (1*sp_df[time_index].dt.is_leap_year)) + sp_df[time_index].dt.day_of_year
-        sp_df[time_index] -= sp_df[time_index].min()
+        min_date = sp_df[time_index].min()
+        sp_df[time_index] = (sp_df[time_index] - min_date).dt.days
 
         sp_df["SPY_Prediction"] = "SPY"
 

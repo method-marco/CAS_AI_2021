@@ -105,7 +105,7 @@ class TFTSP500:
             val_dataloaders=val_dataloader,
         )
 
-    def evaluate(self):
+    def evaluate(self, number_of_examples = 1):
         # load the best model according to the validation loss
         # (given that we use early stopping, this is not necessarily the last epoch)
         best_model_path = self.trainer.checkpoint_callback.best_model_path
@@ -115,7 +115,7 @@ class TFTSP500:
         val_dataloader = self.validation.to_dataloader(train=False, batch_size=self.batch_size * 10, num_workers=0)
         raw_predictions, x = best_tft.predict(val_dataloader, mode="raw", return_x=True)
 
-        for idx in range(10):  # plot 10 examples
+        for idx in range(number_of_examples):  # plot 10 examples
             best_tft.plot_prediction(x, raw_predictions, idx=idx, add_loss_to_title=True);
 
 

@@ -83,5 +83,6 @@ def start_sp500_tft():
     tft.load_data()
     tft.create_tft_model()
     tft.train()
-    tft.evaluate()
+    tft.evaluate(number_of_examples=1)
+    plt.show()
 

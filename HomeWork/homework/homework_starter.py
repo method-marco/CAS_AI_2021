@@ -5,6 +5,7 @@ from homework.binary_classification.NeuronalNetwork import NeuralNetwork
 from homework.variational_atuoencoder.VAETrainer import VAETrainer
 from homework.variational_atuoencoder.DataAugmenter import DataAugmenter
 from homework.forecasting.TFTSP500 import TFTSP500
+from homework.reinforcement_learning.monte_carlo.FrozenLakeMC import FrozenLakeMC
 from torch import nn
 import matplotlib.pyplot as plt
 
@@ -86,3 +87,7 @@ def start_sp500_tft():
     tft.evaluate(number_of_examples=1)
     plt.show()
 
+
+def start_frozen_lake_mc():
+    flmc = FrozenLakeMC()
+    flmc.print_environment_info()

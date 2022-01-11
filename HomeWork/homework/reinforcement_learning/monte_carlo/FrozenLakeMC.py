@@ -7,4 +7,8 @@ from collections import defaultdict
 class FrozenLakeMC:
 
     def __init__(self):
-        env = gym.make('FrozenLake-v0', is_slippery=False)
+        self.env = gym.make('FrozenLake-v1', is_slippery=False)
+
+    def print_environment_info(self):
+        print('Observations: {}'.format(self.env.observation_space))
+        print('Actions: {}'.format(self.env.action_space))

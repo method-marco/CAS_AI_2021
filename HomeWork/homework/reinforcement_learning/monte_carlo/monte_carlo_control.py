@@ -4,6 +4,26 @@ import numpy as np
 from collections import defaultdict
 
 
+def run_episode(env, policy, gamma=1.0, render=False):
+    """ Runs an episode and return the total reward """
+    obs = env.reset()
+    total_reward = 0
+    step_idx = 0
+    while True:
+        if render:
+            env.render()
+        if obs in policy:
+            action = int(policy[obs])
+        else:
+            action = env.action_space.sample()
+        obs, reward, done, _ = env.step(action)
+        total_reward += (gamma ** step_idx * reward)
+        step_idx += 1
+        if done:
+            break
+    return total_reward
+
+
 def generate_episode_from_Q(env, Q, epsilon, nA):
     """ generates an episode from following the epsilon-greedy policy """
     episode = []
@@ -74,26 +94,6 @@ def mc_prediction_control(env, num_episodes, alpha, gamma=1.0, eps_start=1.0, ep
     policy = dict((state, np.argmax(actions)) for state, actions in Q.items())  # control - Q table wird gelesen
     print()
     return policy, Q
-
-
-def run_episode(env, policy, gamma=1.0, render=False):
-    """ Runs an episode and return the total reward """
-    obs = env.reset()
-    total_reward = 0
-    step_idx = 0
-    while True:
-        if render:
-            env.render()
-        if obs in policy:
-            action = int(policy[obs])
-        else:
-            action = env.action_space.sample()
-        obs, reward, done, _ = env.step(action)
-        total_reward += (gamma ** step_idx * reward)
-        step_idx += 1
-        if done:
-            break
-    return total_reward
 
 
 def evaluate_policy(env, policy, gamma=1.0, n=100):

@@ -18,10 +18,10 @@ class FrozenLakeMC:
         self.policy = policy
         return policy
 
-    def evaluate(self):
+    def evaluate(self, num_episodes=100):
         if not self.policy:
             print('Train first!')
             return 'Train first!'
-        return evaluate_policy(self.env, self.policy)
+        return evaluate_policy(self.env, self.policy, n = num_episodes)
 
 

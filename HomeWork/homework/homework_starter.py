@@ -91,3 +91,6 @@ def start_sp500_tft():
 def start_frozen_lake_mc():
     flmc = FrozenLakeMC()
     flmc.print_environment_info()
+    flmc.train()
+    mean_score = flmc.evaluate()
+    print('Mean Score: {}'.format(mean_score))

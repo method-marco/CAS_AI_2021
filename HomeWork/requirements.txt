@@ -8,3 +8,4 @@ pyarrow
 yfinance
 requests
 bs4
+gym

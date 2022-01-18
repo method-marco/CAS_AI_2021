@@ -4,7 +4,7 @@ from pytorch_forecasting.metrics import SMAPE, PoissonLoss, QuantileLoss
 from pytorch_lightning.callbacks import EarlyStopping, LearningRateMonitor
 from pytorch_lightning.loggers import TensorBoardLogger
 import torch
-from homework.dataset.SP500DataSet import SP500DataSet
+from homework.dataset.SP500ReturnsDataSet import SP500ReturnsDataSet
 import pandas as pd
 
 import os
@@ -23,7 +23,7 @@ class TFTSP500:
         self.batch_size = 128
 
     def load_data(self):
-        dataset = SP500DataSet()
+        dataset = SP500ReturnsDataSet()
         sp_df = dataset.load(binary=False)
 
         time_index = "date"

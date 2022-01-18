@@ -1,4 +1,5 @@
 import homework.gradient_descent as gradient_descent
+from homework.dataset.SP500ReturnsDataSet import SP500ReturnsDataSet
 from homework.dataset.SP500DataSet import SP500DataSet
 from homework.binary_classification.BinaryClassificationTrainer import BinaryClassificationTrainer
 from homework.binary_classification.NeuronalNetwork import NeuralNetwork
@@ -6,7 +7,7 @@ from homework.variational_atuoencoder.VAETrainer import VAETrainer
 from homework.variational_atuoencoder.DataAugmenter import DataAugmenter
 from homework.forecasting.TFTSP500 import TFTSP500
 from homework.reinforcement_learning.monte_carlo.FrozenLakeMC import FrozenLakeMC
-from homework.reinforcement_learning.enivronment.TradingEnv import TradingEnv
+from homework.reinforcement_learning.enivronment.TradingEnv import TradingEnv, TradingActions
 from torch import nn
 import matplotlib.pyplot as plt
 
@@ -18,7 +19,7 @@ def start_homework_gradient_descent():
 
 
 def start_sp500_binary_classification():
-    dataset = SP500DataSet()
+    dataset = SP500ReturnsDataSet()
     data = dataset.load()
     features = data.drop('SPY', axis=1).values
     labels = data.SPY
@@ -31,7 +32,7 @@ def start_sp500_binary_classification():
 
 
 def start_data_generator_with_vae():
-    dataset = SP500DataSet()
+    dataset = SP500ReturnsDataSet()
     data = dataset.load()
     features = data.drop('SPY', axis=1).values
     labels = data.SPY
@@ -52,7 +53,7 @@ def start_data_generator_with_vae():
 
 
 def start_data_augmenter_sp500():
-    dataset = SP500DataSet()
+    dataset = SP500ReturnsDataSet()
     data = dataset.load()
     features = data.drop('SPY', axis=1).values
     labels = data.SPY
@@ -64,7 +65,7 @@ def start_data_augmenter_sp500():
 
 
 def start_sp500_binary_classification_with_augmented_data():
-    dataset = SP500DataSet()
+    dataset = SP500ReturnsDataSet()
     data = dataset.load()
     features = data.drop('SPY', axis=1).values
     labels = data.SPY
@@ -98,8 +99,26 @@ def start_frozen_lake_mc():
 
 
 def start_rl_trading_env():
-    dataset = SP500DataSet()
+    stocks = ['AAPL', 'MSFT', 'NFLX', 'AMZN']
+
+    dataset = SP500DataSet(stocks)
     df_data = dataset.load()
-    env = TradingEnv(df_data, None)
-    state = env.reset()
-    print(state)
+
+    env = TradingEnv(stocks, df_data, None)
+    print(env.states)
+
+    n_episodes = 1
+    for i in range(n_episodes):
+        state = env.reset()
+        print(state)
+        done = False
+        next_action = TradingActions.Hold
+        while not done:
+            next_state, reward, done = env.step(next_action)
+            print('Action: {}, Reward: {}'.format(next_action, reward))
+            if reward < 0:
+                next_action=TradingActions.Buy
+            elif reward < 0:
+                next_action=TradingActions.Hold
+            else:
+                next_action=TradingActions.Sell

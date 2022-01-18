@@ -6,6 +6,7 @@ from homework.variational_atuoencoder.VAETrainer import VAETrainer
 from homework.variational_atuoencoder.DataAugmenter import DataAugmenter
 from homework.forecasting.TFTSP500 import TFTSP500
 from homework.reinforcement_learning.monte_carlo.FrozenLakeMC import FrozenLakeMC
+from homework.reinforcement_learning.enivronment.TradingEnv import TradingEnv
 from torch import nn
 import matplotlib.pyplot as plt
 
@@ -94,3 +95,11 @@ def start_frozen_lake_mc():
     flmc.train(num_episodes=100000)
     mean_score = flmc.evaluate(num_episodes=100)
     print('Mean Score: {}'.format(mean_score))
+
+
+def start_rl_trading_env():
+    dataset = SP500DataSet()
+    df_data = dataset.load()
+    env = TradingEnv(df_data, None)
+    state = env.reset()
+    print(state)

@@ -134,7 +134,8 @@ def start_rl_mountain_car():
     scores = SarsaMaxDiscrete.run(agent, env, num_episodes=100000)
     SarsaMaxDiscrete.plot_scores(scores)
     SarsaMaxDiscrete.plot_q_table(agent.q_table)
-    SarsaMaxDiscrete.test_agent(env, agent)
+    for i in range(100):
+        SarsaMaxDiscrete.test_agent(env, agent)
 
 def start_rl_cart_pole():
     # https://github.com/openai/gym/blob/master/gym/envs/classic_control/cartpole.py
@@ -144,4 +145,5 @@ def start_rl_cart_pole():
     scores = SarsaMaxDiscrete.run(agent, env, num_episodes=100000)
     SarsaMaxDiscrete.plot_scores(scores)
     SarsaMaxDiscrete.plot_q_table(agent.q_table)
-    SarsaMaxDiscrete.test_agent(env, agent)
+    for i in range(100):
+        SarsaMaxDiscrete.test_agent(env, agent)

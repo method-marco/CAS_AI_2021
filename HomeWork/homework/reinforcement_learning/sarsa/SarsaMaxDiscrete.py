@@ -156,7 +156,7 @@ class SarsaMaxDiscrete:
                     print("\rEpisode {}/{} | Max Average Score: {}".format(i_episode, num_episodes, max_avg_score),
                           end="")
                     sys.stdout.flush()
-
+        print()
         return scores
 
     @staticmethod
@@ -198,4 +198,3 @@ class SarsaMaxDiscrete:
                 print('Score: ', score)
                 print('Number of Actions: ', t)
                 break
-        env.close()

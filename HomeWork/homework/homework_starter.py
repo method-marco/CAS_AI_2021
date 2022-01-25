@@ -1,3 +1,5 @@
+import numpy as np
+
 import homework.gradient_descent as gradient_descent
 from homework.dataset.SP500ReturnsDataSet import SP500ReturnsDataSet
 from homework.dataset.SP500DataSet import SP500DataSet
@@ -119,11 +121,11 @@ def start_rl_trading_env():
             next_state, reward, done = env.step(next_action)
             print('Action: {}, Reward: {}'.format(next_action, reward))
             if reward < 0:
-                next_action=TradingActions.Buy
+                next_action = TradingActions.Buy
             elif reward < 0:
-                next_action=TradingActions.Hold
+                next_action = TradingActions.Hold
             else:
-                next_action=TradingActions.Sell
+                next_action = TradingActions.Sell
 
 
 def start_rl_mountain_car():
@@ -136,14 +138,28 @@ def start_rl_mountain_car():
     SarsaMaxDiscrete.plot_q_table(agent.q_table)
     for i in range(100):
         SarsaMaxDiscrete.test_agent(env, agent)
+    plt.show()
+
 
 def start_rl_cart_pole():
     # https://github.com/openai/gym/blob/master/gym/envs/classic_control/cartpole.py
     env = gym.make('CartPole-v0')
     env.seed(505)
-    agent = SarsaMaxDiscrete(env, bins=(20, 10))
-    scores = SarsaMaxDiscrete.run(agent, env, num_episodes=100000)
+
+    # change low and high for inf values
+    low = env.observation_space.low
+    low[1] = -1
+    low[3] = -1
+    high = env.observation_space.high
+    high[1] = 1
+    high[3] = 1
+    bins = (5, 5, 20, 10)
+
+    agent = SarsaMaxDiscrete(env, bins=bins, low=low, high=high)
+    scores = SarsaMaxDiscrete.run(agent, env, num_episodes=10000)
     SarsaMaxDiscrete.plot_scores(scores)
-    SarsaMaxDiscrete.plot_q_table(agent.q_table)
+    scores = []
     for i in range(100):
-        SarsaMaxDiscrete.test_agent(env, agent)
+        scores.append(SarsaMaxDiscrete.test_agent(env, agent, print=False))
+    print('Average Score: ', np.average(scores))
+    plt.show()

@@ -7,13 +7,19 @@ import sys
 class SarsaMaxDiscrete:
     """Q-Learning agent that can act on a continuous state space by discretizing it."""
 
-    def __init__(self, env, bins=(10, 10), alpha=0.02, gamma=0.99,
+    def __init__(self, env, bins, low=None, high=None, alpha=0.02, gamma=0.99,
                  epsilon=1.0, epsilon_decay_rate=0.9995, min_epsilon=.01, seed=505):
         """Initialize variables, create grid for discretization."""
         # Environment info
         self.env = env
-        self.state_grid = SarsaMaxDiscrete.create_uniform_grid(env.observation_space.low, env.observation_space.high,
-                                                               bins)
+
+        if not np.any(low):
+            low = env.observation_space.low
+        if not np.any(high):
+            high = env.observation_space.high
+
+        self.state_grid = SarsaMaxDiscrete.create_uniform_grid(low, high, bins)
+
         self.state_size = tuple(len(splits) + 1 for splits in self.state_grid)  # n-dimensional state space
         self.action_size = self.env.action_space.n  # 1-dimensional discrete action space
         self.seed = np.random.seed(seed)
@@ -187,7 +193,7 @@ class SarsaMaxDiscrete:
         ax.set_ylabel('velocity')
 
     @staticmethod
-    def test_agent(env, agent, number_of_episodes=1000):
+    def test_agent(env, agent, number_of_episodes=1000, print=True):
         state = env.reset()
         score = 0
         for t in range(number_of_episodes):
@@ -195,6 +201,8 @@ class SarsaMaxDiscrete:
             state, reward, done, _ = env.step(action)
             score += reward
             if done:
-                print('Score: ', score)
-                print('Number of Actions: ', t)
+                if print:
+                    print('Score: ', score)
+                    print('Number of Actions: ', t)
                 break
+        return score

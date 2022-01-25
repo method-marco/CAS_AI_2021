@@ -8,7 +8,9 @@ from homework.variational_atuoencoder.DataAugmenter import DataAugmenter
 from homework.forecasting.TFTSP500 import TFTSP500
 from homework.reinforcement_learning.monte_carlo.FrozenLakeMC import FrozenLakeMC
 from homework.reinforcement_learning.enivronment.TradingEnv import TradingEnv, TradingActions
+from homework.reinforcement_learning.sarsa.SarsaMaxDiscrete import SarsaMaxDiscrete
 from torch import nn
+import gym
 import matplotlib.pyplot as plt
 
 
@@ -122,3 +124,24 @@ def start_rl_trading_env():
                 next_action=TradingActions.Hold
             else:
                 next_action=TradingActions.Sell
+
+
+def start_rl_mountain_car():
+    # https://github.com/openai/gym/blob/master/gym/envs/classic_control/mountain_car.py
+    env = gym.make('MountainCar-v0')
+    env.seed(505)
+    agent = SarsaMaxDiscrete(env, bins=(20, 10))
+    scores = SarsaMaxDiscrete.run(agent, env, num_episodes=100000)
+    SarsaMaxDiscrete.plot_scores(scores)
+    SarsaMaxDiscrete.plot_q_table(agent.q_table)
+    SarsaMaxDiscrete.test_agent(env, agent)
+
+def start_rl_cart_pole():
+    # https://github.com/openai/gym/blob/master/gym/envs/classic_control/cartpole.py
+    env = gym.make('CartPole-v0')
+    env.seed(505)
+    agent = SarsaMaxDiscrete(env, bins=(20, 10))
+    scores = SarsaMaxDiscrete.run(agent, env, num_episodes=100000)
+    SarsaMaxDiscrete.plot_scores(scores)
+    SarsaMaxDiscrete.plot_q_table(agent.q_table)
+    SarsaMaxDiscrete.test_agent(env, agent)

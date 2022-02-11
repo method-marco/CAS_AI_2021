@@ -2,7 +2,6 @@ numpy
 pandas
 matplotlib
 torch
-pytorch-forecasting
 pytorch-lightning
 pyarrow
 yfinance
@@ -12,3 +11,4 @@ gym
 torchmetrics
 beautifulsoup4
 tensorflow
+pyglet

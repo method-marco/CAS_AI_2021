@@ -9,3 +9,6 @@ yfinance
 requests
 bs4
 gym
+torchmetrics
+beautifulsoup4
+tensorflow

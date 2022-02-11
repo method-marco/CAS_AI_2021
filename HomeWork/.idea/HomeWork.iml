@@ -4,11 +4,15 @@
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/venv" />
       <excludeFolder url="file://$MODULE_DIR$/venv-native" />
+      <excludeFolder url="file://$MODULE_DIR$/venv-intel" />
+      <excludeFolder url="file://$MODULE_DIR$/venv3.10" />
+      <excludeFolder url="file://$MODULE_DIR$/venv3.10-intel" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.9 (venv-native)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.10 (intel)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PackageRequirementsSettings">
     <option name="versionSpecifier" value="Don't specify version" />
+    <option name="removeUnused" value="true" />
   </component>
 </module>

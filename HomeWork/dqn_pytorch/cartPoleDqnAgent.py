@@ -22,7 +22,7 @@ class Agent:
         self.observations = self.env.observation_space.shape
         self.actions = self.env.action_space.n
         # DQN Agent Variables
-        self.replay_buffer_size = 50_000
+        self.replay_buffer_size = 10_000
         self.train_start = 1_000
         self.memory: Deque = collections.deque(
             maxlen=self.replay_buffer_size
@@ -95,6 +95,8 @@ class Agent:
 
     def remember(self, state, action, reward, next_state, done):
         self.memory.append((state, action, reward, next_state, done))
+        if len(self.memory) < self.train_start:
+            return
         if self.epsilon > self.epsilon_min:
             self.epsilon *= self.epsilon_decay
 
@@ -111,8 +113,9 @@ class Agent:
         rewards = torch.tensor(rewards)
 
         q_values = self.dqn(states)
-        q_values_next = self.target_dqn(states_next)
-        q_values_expected = q_values.clone().detach()
+        q_values_next = self.target_dqn(states_next).detach()
+        q_values_expected = q_values.detach().clone()
+
         for i in range(self.batch_size):
             a = actions[i]
             done = dones[i]
@@ -151,6 +154,6 @@ class Agent:
 if __name__ == "__main__":
     env = gym.make("CartPole-v1")
     agent = Agent(env)
-    agent.train(num_episodes=500)
+    agent.train(num_episodes=250)
     input("Play?")
     agent.play(num_episodes=20, render=True)

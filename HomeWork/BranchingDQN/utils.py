@@ -14,14 +14,14 @@ from scipy.ndimage.filters import gaussian_filter1d
 def arguments(): 
 
     parser = ArgumentParser()
-    parser.add_argument('--env', default = 'BipedalWalker-v2')
+    parser.add_argument('--env', default = 'BipedalWalker-v3')
 
     return parser.parse_args()
 
 
-def save(agent, rewards, args): 
+def save(agent, rewards, env_name):
 
-    path = './runs/{}/'.format(args.env)
+    path = './runs/{}/'.format(env_name)
     try: 
         os.makedirs(path)
     except: 
@@ -34,7 +34,7 @@ def save(agent, rewards, args):
     plt.plot(gaussian_filter1d(rewards, sigma = 5), c = 'r', label = 'Rewards')
     plt.xlabel('Episodes')
     plt.ylabel('Cumulative reward')
-    plt.title('Branching DDQN: {}'.format(args.env))
+    plt.title('Branching DDQN: {}'.format(env_name))
     plt.savefig(os.path.join(path, 'reward.png'))
 
     pd.DataFrame(rewards, columns = ['Reward']).to_csv(os.path.join(path, 'rewards.csv'), index = False)
@@ -55,7 +55,8 @@ class AgentConfig:
                  memory_size = 100000, 
                  batch_size = 128, 
                  learning_starts = 5000,
-                 max_frames = 10000000): 
+                 max_frames = 10000000,
+                 tau = 0.1):
 
         self.epsilon_start = epsilon_start
         self.epsilon_final = epsilon_final
@@ -71,6 +72,7 @@ class AgentConfig:
 
         self.learning_starts = learning_starts
         self.max_frames = max_frames
+        self.tau = tau
 
 
 class ExperienceReplayMemory:

@@ -1,17 +1,14 @@
-from tqdm import tqdm
-import torch 
+import torch
 import torch.nn as nn 
-import torch.nn.functional as F 
-import torch.optim as optim 
-from torch.distributions import Categorical 
-
-import numpy as np 
-import gym 
-import random 
+import torch.nn.functional as F
 
 from model import DuelingNetwork, BranchingQNetwork
-from utils import TensorEnv, ExperienceReplayMemory, AgentConfig, BranchingTensorEnv
+from utils import TensorEnv, ExperienceReplayMemory, AgentConfig, BranchingTensorEnv, get_bipedal_walker_settings
+import torch.optim as optim
 import utils
+import numpy as np
+from tqdm import tqdm
+
 
 class BranchingDQN(nn.Module): 
 
@@ -79,22 +76,18 @@ class BranchingDQN(nn.Module):
             self.target.update_model_mixed(self.q, self.tau)
 
 
-if __name__ == '__main__':
-    env_name = 'BipedalWalker-v3'
-    bins = 6
-    env = BranchingTensorEnv(env_name, bins)
+def train(env_name, config):
+    env = BranchingTensorEnv(env_name, config.bins)
 
-    config = AgentConfig()
     memory = ExperienceReplayMemory(config.memory_size)
-    agent = BranchingDQN(env.observation_space.shape[0], env.action_space.shape[0], bins, config)
-    adam = optim.Adam(agent.q.parameters(), lr = config.lr)
-
+    agent = BranchingDQN(env.observation_space.shape[0], env.action_space.shape[0], config.bins, config)
+    adam = optim.Adam(agent.q.parameters(), lr=config.lr)
 
     s = env.reset()
     ep_reward = 0.
     recap = []
 
-    p_bar = tqdm(total = config.max_frames)
+    p_bar = tqdm(total=config.max_frames)
     for frame in range(config.max_frames):
 
         epsilon = config.epsilon_by_frame(frame)
@@ -102,7 +95,7 @@ if __name__ == '__main__':
         if np.random.random() > epsilon:
             action = agent.get_action(s)
         else:
-            action = np.random.randint(0, bins, size = env.action_space.shape[0])
+            action = np.random.randint(0, config.bins, size=env.action_space.shape[0])
 
         ns, r, done, infos = env.step(action)
         ep_reward += r
@@ -124,6 +117,9 @@ if __name__ == '__main__':
         if frame % 1000 == 0:
             utils.save(agent, recap, env_name)
 
-
-
     p_bar.close()
+
+
+if __name__ == '__main__':
+    env_name, config = get_bipedal_walker_settings()
+    train(env_name, config)

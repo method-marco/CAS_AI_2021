@@ -11,34 +11,33 @@ import random
 import time 
 
 from model import BranchingQNetwork 
-from utils import TensorEnv, ExperienceReplayMemory, AgentConfig, BranchingTensorEnv
-import utils
+from utils import BranchingTensorEnv, get_bipedal_walker_settings
 
-args = utils.arguments()
 
-bins = 6 
-env = BranchingTensorEnv(args.env, bins)
-        
-agent = BranchingQNetwork(env.observation_space.shape[0], env.action_space.shape[0], bins)
-agent.load_state_dict(torch.load('./runs/{}/model_state_dict'.format(args.env)))
+if __name__ == '__main__':
+    env_name, config = get_bipedal_walker_settings()
+    env = BranchingTensorEnv(env_name, config.bins)
 
-print(agent)
-for ep in tqdm(range(10)):
+    agent = BranchingQNetwork(env.observation_space.shape[0], env.action_space.shape[0], config.bins)
+    agent.load_state_dict(torch.load('./runs/{}/model_state_dict'.format(env_name)))
 
-    s = env.reset()
-    done = False
-    ep_reward = 0
-    while not done: 
+    print(agent)
+    for ep in tqdm(range(10)):
 
-        with torch.no_grad(): 
-            out = agent(s).squeeze(0)
-        action = torch.argmax(out, dim = 1).numpy().reshape(-1)
-        print(action)
-        s, r, done, _ = env.step(action)
+        s = env.reset()
+        done = False
+        ep_reward = 0
+        while not done:
 
-        env.render()
-        ep_reward += r 
+            with torch.no_grad():
+                out = agent(s).squeeze(0)
+            action = torch.argmax(out, dim = 1).numpy().reshape(-1)
+            print(action)
+            s, r, done, _ = env.step(action)
 
-    print('Ep reward: {:.3f}'.format(ep_reward))
+            env.render()
+            ep_reward += r
 
-env.close()
+        print('Ep reward: {:.3f}'.format(ep_reward))
+
+    env.close()

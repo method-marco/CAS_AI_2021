@@ -11,12 +11,24 @@ plt.style.use('ggplot')
 from scipy.ndimage.filters import gaussian_filter1d
 
 
-def arguments(): 
+def get_bipedal_walker_settings():
+    env_name = 'BipedalWalker-v3'
 
-    parser = ArgumentParser()
-    parser.add_argument('--env', default = 'BipedalWalker-v3')
+    config = AgentConfig()
+    config.epsilon_start = 1.
+    config.epsilon_final = 0.01
+    config.epsilon_decay = 8000
+    config.gamma = 0.99
+    config.lr = 1e-4
+    config.target_net_update_freq = 1000
+    config.memory_size = 100000
+    config.batch_size = 128
+    config.learning_starts = 5000
+    config.max_frames = 10000000
+    config.tau = 0.1
+    config.bins = 6
 
-    return parser.parse_args()
+    return env_name, config
 
 
 def save(agent, rewards, env_name):

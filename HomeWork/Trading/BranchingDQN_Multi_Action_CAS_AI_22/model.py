@@ -43,7 +43,7 @@ class BranchingQNetwork(nn.Module):
 
         self.value_head = nn.Linear(128, 1)
         self.adv_heads = nn.ModuleList([nn.Linear(128, n) for i in range(ac_dim)])
-        #print(self.model)
+
 
     def forward(self, x): 
 
@@ -53,6 +53,17 @@ class BranchingQNetwork(nn.Module):
         q_val = value.unsqueeze(2) + advs - advs.mean(2, keepdim = True )
 
         return q_val
+
+    def update_model_mixed(self, other_model, tau=0.1):
+        new_target_dict = {}
+        my_dict = self.state_dict()
+        other_dict = other_model.state_dict()
+        for param in my_dict:
+            target_ratio = (1.0 - tau) * my_dict[param] #target_model
+            online_ratio = tau * other_dict[param] # online_model
+            mixed_weights = target_ratio + online_ratio
+            new_target_dict[param] = mixed_weights
+        self.load_state_dict(new_target_dict)
 
 # b = BranchingQNetwork(5, 4, 6)
 

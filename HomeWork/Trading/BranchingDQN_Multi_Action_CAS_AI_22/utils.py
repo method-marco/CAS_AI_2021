@@ -81,25 +81,25 @@ def save(agent, hist, args):
     plt.cla()
     plt.clf()
     plt.plot(np.array(portfolio_hist) + np.array(cash_hist), c='r', alpha=0.3)
-    plt.plot(gaussian_filter1d(np.array(portfolio_hist) + np.array(cash_hist), sigma=5), c='r', label='Cash + Portfolio')
+    plt.plot(gaussian_filter1d(np.array(portfolio_hist) + np.array(cash_hist), sigma=5), c='r',
+             label='Cash + Portfolio')
     plt.xlabel('Episodes')
     plt.ylabel('$Cash$ + Portfolio')
     plt.title('Cash + Portfolio')
     plt.savefig(os.path.join(path, 'cash_and_portfolio.png'))
 
 
-
 class EnvConfig:
 
     def __init__(self,  # more stocks ['AAPL', 'MSFT', 'AMZN']
-                 stocks=['NFLX', 'XOM', 'JPM', 'T', 'AAPL', 'AMZN'],
+                 stocks=['JPM', 'T', 'AAPL', 'AMZN'],
                  #  'XLC' removed since it starts in 2018
-                 #stocks=['XLE', 'XLP', 'XLI', 'XLF', 'XLK',  'XLU', 'XLV', 'XLY', 'XLB'],
-                 initial_cash=10_000):
+                 # stocks=['XLE', 'XLP', 'XLI', 'XLF', 'XLK',  'XLU', 'XLV', 'XLY', 'XLB'],
+                 initial_cash=2_000):
         self.stocks = stocks
         self.initial_cash = initial_cash
         self.stocks_adj_close_names = [stock + '_Adj_Close' for stock in self.stocks]
-        #self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        # self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.cuda = True
         cuda = self.cuda and torch.cuda.is_available()
         self.device = torch.device("cuda" if cuda else "cpu")
@@ -110,7 +110,7 @@ class AgentConfig:
     def __init__(self,
                  epsilon_start=1.,
                  epsilon_final=0.01,
-                 epsilon_decay=10*8000,
+                 epsilon_decay=10 * 8000,
                  gamma=0.99,
                  lr=1e-4,
                  target_net_update_freq=1000,
@@ -119,7 +119,8 @@ class AgentConfig:
                  learning_starts=5000,
                  max_frames=10_000_000,
                  max_episodes=60,
-                 bins=201):
+                 bins=201,
+                 tau=0.1):
         self.epsilon_start = epsilon_start
         self.epsilon_final = epsilon_final
         self.epsilon_decay = epsilon_decay
@@ -128,6 +129,8 @@ class AgentConfig:
 
         self.gamma = gamma
         self.lr = lr
+
+        self.tau = tau
 
         self.target_net_update_freq = target_net_update_freq
         self.memory_size = memory_size
@@ -140,7 +143,7 @@ class AgentConfig:
         self.cuda = True
         cuda = self.cuda and torch.cuda.is_available()
         self.device = torch.device("cuda" if cuda else "cpu")
-        #self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        # self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
 
 class VAEConfig:
@@ -213,10 +216,12 @@ class BranchingTensorEnv(TensorEnv):
     def __init__(self, env_name, n):
         super().__init__(env_name)
         self.n = n
-        self.discretized = np.linspace(-1., 1., self.n)
+        # take from env
+        self.discretized = [np.linspace(self.action_space.low[i], self.action_space.high[i], self.n) for i in
+                            range(len(self.action_space.low))]
 
     def step(self, a):
-        # in a stehen die indizes per action (2,1,3...)
-        action = np.array([self.discretized[aa] for aa in a])
-
-        return super().step(action)
+        actions = []
+        for i, a in enumerate(a):
+            actions.append(self.discretized[i][a])
+        return super().step(np.array(actions))

@@ -14,4 +14,3 @@ tensorflow
 pyglet
 box2d-py
 tqdm
-sdv

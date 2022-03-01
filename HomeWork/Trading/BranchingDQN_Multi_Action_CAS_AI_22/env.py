@@ -100,35 +100,34 @@ class MyEnv(gym.Env):
         sharpe = self.get_sharpe(self.play, None)
         self.weights = sharpe.get_weights()
         # ret, vol, sh = sharpe.get_ret_vol_sr(self.weights)
-
-        # print(self.weights)
-
         current_prices = self.df.iloc[self.current_idx][self.config.stocks_adj_close_names].values
         # current_price = np.dot(self.weights, current_prices) - # todo Fehler?
 
         self.cash = self.weights * np.sum(self.cash)
-
-        # print(self.cash)
-        env_action = np.zeros(len(actions))
+        env_actions = np.zeros(len(actions))
+        provisions = 0.02
         for i, action in enumerate(actions):
-            # buy_max = self.cash // (current_price * 1.01)  # 10% provisions
-            buy_max = self.cash[i] // current_prices[i]  # ohne 10% provisions
+            buy_max = self.cash[i] // (current_prices[i] * (1+provisions))  # with provisions
+            #buy_max = self.cash[i] // current_prices[i]  # ohne provisions
 
+            # buy or sell stocks
             if action > 0:
-                env_action[i] = np.minimum(buy_max, action)
+                # buy "action" stocks or max if "action" is higher
+                env_actions[i] = np.minimum(buy_max, action)
             else:
                 # env_action = - np.minimum(self.stock_values, np.abs(action * self.weights)) # todo
-                env_action[i] = - np.minimum(self.stock_values[i], np.abs(action))
+                # sell "action" stocks or all of "action" is higher
+                env_actions[i] = - np.minimum(self.stock_values[i], np.abs(action))
 
-            self.stock_values[i] += env_action[i]
+            self.stock_values[i] += env_actions[i]
 
-            if action > 0:
-                self.cash[i] -= env_action[i] * current_prices[i]
+            # update cash
+            if action > 0: # buy
+                self.cash[i] -= env_actions[i] * current_prices[i] * (1 + provisions)
             else:  # sell
-                self.cash[i] += - env_action[i] * current_prices[i]
+                self.cash[i] += - env_actions[i] * current_prices[i] * (1 + provisions)
 
-            provision = np.abs(env_action[i]) * current_prices[i] * .01
-            # self.cash -= provisions
+            provision = np.abs(env_actions[i]) * current_prices[i] * provisions
 
             self.provisions[i] += provision
 
@@ -145,10 +144,10 @@ class MyEnv(gym.Env):
             # compute reward
             # print("return", np.sum(env_action * current_price * (np.exp(self.rewards[self.current_idx]) - 1)))
             # print("provisions", np.sum(.01 * np.abs(env_action) * current_price))
-            step_reward = np.sum(env_action * current_prices * (np.exp(self.rewards[self.current_idx]) - 1)) - np.sum(.001 * np.abs(env_action) * current_prices)
+            step_reward = np.sum(env_actions * current_prices * (np.exp(self.rewards[self.current_idx]) - 1)) - np.sum(.001 * np.abs(env_actions) * current_prices)
             next_prices = self.df.iloc[self.current_idx][self.config.stocks_adj_close_names].values
             self.portfolio_value = np.dot(self.stock_values, next_prices)
-            '''
+
             invested_index = np.where(self.stock_values != 0) # invested
             
             invested_sharpe = self.get_sharpe(self.play, invested_index)
@@ -160,17 +159,14 @@ class MyEnv(gym.Env):
                 vol = 10
             
             reward = self.portfolio_value * sh + step_reward * 252
-            
-            '''
 
-            reward = self.portfolio_value
+            #reward = self.portfolio_value
 
 
 
             next_state = self.states[self.current_idx]
-            kernel = self.states[self.current_idx:self.current_idx+7, 1][::-1]
-
-            print(kernel)
+            #kernel = self.states[self.current_idx:self.current_idx+7, 1][::-1]
+            #print(kernel)
             next_state = np.array(next_state).reshape(1, -1)
             next_state = torch.tensor(next_state).reshape(1, -1).float().to(self.config.device)
 

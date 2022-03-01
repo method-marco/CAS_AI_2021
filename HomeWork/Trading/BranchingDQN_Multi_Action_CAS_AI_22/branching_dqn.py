@@ -41,23 +41,19 @@ class BranchingDQN(nn.Module):
     def get_action(self, x):
 
         with torch.no_grad():
-            # a = self.q(x).max(1)[1]
             out = self.q(x).squeeze(0)
             action = torch.argmax(out, dim=1)
         return action.cpu().numpy()
 
-    def update_policy(self, adam, memory, params):
+    def update_policy(self, adam, memory):
 
-        b_states, b_actions, b_rewards, b_next_states, b_masks = memory.sample(params.batch_size)
+        b_states, b_actions, b_rewards, b_next_states, b_masks = memory.sample(self.config.batch_size)
 
         states = torch.tensor(b_states).float().to(self.config.device)
         actions = torch.tensor(b_actions).long().reshape(states.shape[0], -1, 1).to(self.config.device)
         rewards = torch.tensor(b_rewards).float().reshape(-1, 1).to(self.config.device)
         next_states = torch.tensor(b_next_states).float().to(self.config.device)
         masks = torch.tensor(b_masks).float().reshape(-1, 1).to(self.config.device)
-
-        # qvals = self.q(states)
-
         current_q_values = self.q(states).gather(2, actions).squeeze(-1)
 
         with torch.no_grad():
@@ -68,12 +64,7 @@ class BranchingDQN(nn.Module):
             max_next_q_vals = max_next_q_vals.mean(1, keepdim=True)
 
         expected_q_vals = rewards + max_next_q_vals * 0.99 * masks  # Belmann
-        # print(expected_q_vals[:5])
         loss = F.mse_loss(expected_q_vals, current_q_values)
-
-        # input(loss)
-
-        # print('\n'*5)
 
         adam.zero_grad()
         loss.backward()
@@ -85,7 +76,7 @@ class BranchingDQN(nn.Module):
         self.update_counter += 1
         if self.update_counter % self.target_net_update_freq == 0:
             self.update_counter = 0
-            self.target.load_state_dict(self.q.state_dict())
+            self.target.update_model_mixed(self.q, self.config.tau)
 
 
 def train():
@@ -100,22 +91,10 @@ def train():
     # env = BranchingTensorEnv(args.env, bins)
 
     dataset = MyDataset()
-    train, test = dataset.get_train_test()
-    env = MyEnv(train, test)
+    train_set, test_set = dataset.get_train_test()
+    env = MyEnv(train_set, test_set)
 
-    if True: #dataset.outdated_data_files:
-        trainer = Trainer()
-
-        for epoch in range(1, trainer.vae_config.epochs + 1):
-            trainer.train(epoch)
-            trainer.test(epoch)
-            with torch.no_grad():
-                sample = torch.randn(64, 20).to(trainer.device)
-                sample = trainer.model.decode(sample).cpu()
-
-            trainer.save()
-
-    vae = VAE(train.shape[1] - len(env_config.stocks_adj_close_names)).to(config.device)
+    vae = VAE(train_set.shape[1] - len(env_config.stocks_adj_close_names)).to(config.device)
     vae.load_state_dict(torch.load('./runs/vae/vae_state_dict'))
 
     """with torch.no_grad():
@@ -188,7 +167,7 @@ def train():
         p_bar.update(1)
 
         if frame > config.learning_starts:
-            agent.update_policy(adam, memory, config)
+            agent.update_policy(adam, memory)
 
         if frame % 1000 == 0 and frame != 0:
             utils.save(agent, (recap, portfolio_hist, cash_hist, stock_hist), args)

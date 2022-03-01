@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from model import DuelingNetwork, BranchingQNetwork
-from utils import TensorEnv, ExperienceReplayMemory, AgentConfig, BranchingTensorEnv, get_bipedal_walker_settings
+from utils import TensorEnv, ExperienceReplayMemory, AgentConfig, BranchingTensorEnv
 import torch.optim as optim
 import utils
 import numpy as np
@@ -77,6 +77,7 @@ class BranchingDQN(nn.Module):
 
 
 def train(env_name, config):
+
     env = BranchingTensorEnv(env_name, config.bins)
 
     memory = ExperienceReplayMemory(config.memory_size)
@@ -121,5 +122,5 @@ def train(env_name, config):
 
 
 if __name__ == '__main__':
-    env_name, config = get_bipedal_walker_settings()
+    env_name, config = utils.get_luna_lander_settings()
     train(env_name, config)

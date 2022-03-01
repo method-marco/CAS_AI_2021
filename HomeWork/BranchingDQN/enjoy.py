@@ -11,12 +11,11 @@ import random
 import time 
 
 from model import BranchingQNetwork 
-from utils import BranchingTensorEnv, get_bipedal_walker_settings
-
+import utils
 
 if __name__ == '__main__':
-    env_name, config = get_bipedal_walker_settings()
-    env = BranchingTensorEnv(env_name, config.bins)
+    env_name, config = utils.get_luna_lander_settings()
+    env = utils.BranchingTensorEnv(env_name, config.bins)
 
     agent = BranchingQNetwork(env.observation_space.shape[0], env.action_space.shape[0], config.bins)
     agent.load_state_dict(torch.load('./runs/{}/model_state_dict'.format(env_name)))
@@ -32,12 +31,12 @@ if __name__ == '__main__':
             with torch.no_grad():
                 out = agent(s).squeeze(0)
             action = torch.argmax(out, dim = 1).numpy().reshape(-1)
-            print(action)
+            #print(action)
             s, r, done, _ = env.step(action)
 
             env.render()
             ep_reward += r
 
-        print('Ep reward: {:.3f}'.format(ep_reward))
+        print('\nEp reward: {:.3f}'.format(ep_reward))
 
     env.close()

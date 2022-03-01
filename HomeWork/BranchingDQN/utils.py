@@ -10,6 +10,24 @@ import matplotlib.pyplot as plt
 plt.style.use('ggplot')
 from scipy.ndimage.filters import gaussian_filter1d
 
+def get_luna_lander_settings():
+    env_name = 'LunarLanderContinuous-v2'
+
+    config = AgentConfig()
+    config.epsilon_start = 1.
+    config.epsilon_final = 0.01
+    config.epsilon_decay = 500000
+    config.gamma = 0.99
+    config.lr = 1e-5
+    config.target_net_update_freq = 1000
+    config.memory_size = 100000
+    config.batch_size = 128
+    config.learning_starts = 100000
+    config.max_frames = 5000000
+    config.tau = 0.2
+    config.bins = 60
+
+    return env_name, config
 
 def get_bipedal_walker_settings():
     env_name = 'BipedalWalker-v3'
@@ -142,15 +160,16 @@ class TensorEnv(gym.Wrapper):
 
 class BranchingTensorEnv(TensorEnv): 
 
-    def __init__(self, env_name, n): 
+    def __init__(self, env_name, n):
 
         super().__init__(env_name)
-        self.n = n 
-        self.discretized = np.linspace(-1.,1., self.n)
+        self.n = n
+        # take from env
+        self.discretized = [np.linspace(self.action_space.low[i], self.action_space.high[i], self.n) for i in range(len(self.action_space.low))]
 
 
     def step(self, a):
-
-        action = np.array([self.discretized[aa] for aa in a])
-
-        return super().step(action)
+        actions = []
+        for i, a in enumerate(a):
+            actions.append(self.discretized[i][a])
+        return super().step(np.array(actions))

@@ -13,3 +13,5 @@ beautifulsoup4
 tensorflow
 pyglet
 box2d-py
+tqdm
+sdv

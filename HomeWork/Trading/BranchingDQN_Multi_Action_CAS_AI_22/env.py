@@ -7,7 +7,6 @@ from dataset import MyDataset
 from sharpe import Sharpe
 from utils import EnvConfig
 import pandas as pd
-from astropy.convolution import convolve
 
 
 class MyEnv(gym.Env):

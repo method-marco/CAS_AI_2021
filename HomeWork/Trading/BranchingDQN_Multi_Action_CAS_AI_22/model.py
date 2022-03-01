@@ -50,14 +50,7 @@ class BranchingQNetwork(nn.Module):
         out = self.model(x)
         value = self.value_head(out) # state value
         advs = torch.stack([l(out) for l in self.adv_heads], dim = 1)
-
-
-        # print(advs.shape)
-        # print(advs.mean(2).shape)
-        test =  advs.mean(2, keepdim = True)
-        # input(test.shape)
         q_val = value.unsqueeze(2) + advs - advs.mean(2, keepdim = True )
-        # input(q_val.shape)
 
         return q_val
 

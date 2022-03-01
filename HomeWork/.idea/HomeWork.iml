@@ -8,7 +8,7 @@
       <excludeFolder url="file://$MODULE_DIR$/venv3.10" />
       <excludeFolder url="file://$MODULE_DIR$/venv3.10-intel" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.9 (venv-native)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.9 (venv-intel)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PackageRequirementsSettings">
